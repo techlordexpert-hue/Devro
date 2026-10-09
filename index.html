@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Devro - your work office</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%235b3fd1'/><text x='50' y='70' font-size='62' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700'>D</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f1eef6;--sf:#fff;--sf2:#e8e3f1;--tx:#1f1a2e;--mu:#6c6483;--ac:#5b3fd1;--ac2:#c58a00;--ok:#1f9d74;--bad:#d2476a;--bd:#ddd6ea;--sh:0 10px 30px -12px rgba(60,40,130,.25)}
+:root[data-t=night]{--bg:#17141f;--sf:#221e2d;--sf2:#2c2739;--tx:#ece8f5;--mu:#9a92b3;--ac:#a58cff;--ac2:#e6c24d;--ok:#4fd1a1;--bad:#ff7a9c;--bd:#352f45;--sh:0 12px 30px -14px rgba(0,0,0,.7)}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:Figtree,system-ui,sans-serif;background:var(--bg);color:var(--tx);transition:background .4s,color .4s;padding-top:env(safe-area-inset-top)}
+h1,h2,h3,.brand{font-family:'Bricolage Grotesque',Figtree,sans-serif;letter-spacing:-.02em}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.app{display:grid;grid-template-columns:240px 1fr;height:100%}
+nav{background:var(--sf);border-right:1px solid var(--bd);padding:22px 14px;display:flex;flex-direction:column;gap:6px;transition:background .4s}
+.brand{font-size:26px;font-weight:700;padding:0 10px 18px;display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;color:#fff;font-size:18px;animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-3px) rotate(-4deg)}}
+.tab{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;color:var(--mu);font-weight:500;text-align:left;transition:.2s}
+.tab:hover{background:var(--sf2);color:var(--tx)}
+.tab.on{background:var(--ac);color:#fff;box-shadow:var(--sh)}
+.tab svg{width:20px;height:20px;flex:none}
+.sp{flex:1}
+.me{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;background:var(--sf2);text-align:left;width:100%}
+.me b{display:block;font-size:14px}.me small{color:var(--mu);font-size:12px}
+.av{width:38px;height:38px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;font-weight:600;object-fit:cover;flex:none;overflow:hidden}
+main{overflow:auto;padding:28px clamp(16px,4vw,48px) 40px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+h1{font-size:clamp(26px,4vw,40px);line-height:1.1}
+.sub{color:var(--mu);margin-top:6px}
+.btn{padding:10px 16px;border-radius:12px;background:var(--ac);color:#fff;font-weight:600;transition:.2s;display:inline-flex;gap:8px;align-items:center}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--sh)}
+.btn.g{background:var(--sf2);color:var(--tx)}.btn.s{padding:7px 11px;font-size:13px;border-radius:10px}
+.btn.d{background:transparent;color:var(--bad)}
+.ic{width:42px;height:42px;border-radius:12px;background:var(--sf);border:1px solid var(--bd);display:grid;place-items:center}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:18px;box-shadow:var(--sh)}
+.view{animation:in .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.stat b{font-family:'Bricolage Grotesque';font-size:30px;display:block}.stat span{color:var(--mu);font-size:13px}
+.desk{display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
+.ring{--p:0;width:92px;height:92px;border-radius:50%;background:conic-gradient(var(--ac) calc(var(--p)*1%),var(--sf2) 0);display:grid;place-items:center;transition:.6s;flex:none}
+.ring i{width:72px;height:72px;border-radius:50%;background:var(--sf);display:grid;place-items:center;font-style:normal;font-weight:700;font-family:'Bricolage Grotesque';font-size:20px}
+.row{display:flex;gap:10px;align-items:center}
+input,select,textarea{width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--bd);background:var(--sf);transition:.2s}
+input:focus,textarea:focus,select:focus{border-color:var(--ac);outline:0;box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 25%,transparent)}
+.task{display:flex;gap:12px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--bd);animation:in .3s}
+.task:last-child{border:0}
+.ck{width:24px;height:24px;border-radius:8px;border:2px solid var(--mu);flex:none;display:grid;place-items:center;transition:.2s;color:transparent}
+.done .ck{background:var(--ok);border-color:var(--ok);color:#fff;transform:scale(1.08)}
+.done .tt{text-decoration:line-through;color:var(--mu)}
+.tt{flex:1}.tag{font-size:12px;padding:3px 9px;border-radius:99px;background:var(--sf2);color:var(--mu)}
+.tag.c{background:color-mix(in srgb,var(--ac2) 22%,transparent);color:var(--ac2)}
+.x{color:var(--mu);padding:4px 8px;border-radius:8px}.x:hover{color:var(--bad)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.proj{display:flex;flex-direction:column;gap:10px;transition:.25s}
+.proj:hover{transform:translateY(-4px)}
+.proj.sus{opacity:.62;filter:saturate(.3)}
+.ph{display:flex;gap:12px;align-items:center}
+.fav{width:42px;height:42px;border-radius:12px;background:var(--sf2);display:grid;place-items:center;font-weight:700;color:var(--ac);font-family:'Bricolage Grotesque';font-size:18px;overflow:hidden}
+.fav img{width:26px;height:26px}
+.proj h3{font-size:18px}.proj p{color:var(--mu);font-size:14px;flex:1}
+.pill{margin-left:auto;font-size:12px;padding:4px 10px;border-radius:99px;display:flex;gap:6px;align-items:center;font-weight:600;background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;animation:pulse 2s infinite}
+.sus .pill{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}.sus .pill::before{animation:none}
+@keyframes pulse{50%{opacity:.3}}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 18px}
+.chip{padding:7px 14px;border-radius:99px;background:var(--sf);border:1px solid var(--bd);color:var(--mu);font-size:14px}
+.chip.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.form{display:grid;gap:14px;max-width:620px}
+.form label{display:grid;gap:6px;font-weight:500;font-size:14px}
+.big{display:flex;gap:10px;padding:8px;border-radius:20px;background:var(--sf);border:1px solid var(--bd);box-shadow:var(--sh)}
+.big input{border:0;background:none;font-size:18px;box-shadow:none!important}
+.eng{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.empty{text-align:center;color:var(--mu);padding:36px 10px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,20px);background:var(--tx);color:var(--bg);padding:11px 18px;border-radius:99px;opacity:0;transition:.3s;pointer-events:none;z-index:9}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.big-av{width:110px;height:110px;font-size:40px}
+.log li{list-style:none;padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px;color:var(--mu)}
+.log li:last-child{border:0}
+@media(max-width:860px){
+.app{grid-template-columns:1fr;grid-template-rows:1fr auto}
+nav{order:2;flex-direction:row;border:0;border-top:1px solid var(--bd);padding:8px 8px calc(8px + env(safe-area-inset-bottom));justify-content:space-around;position:relative;z-index:5}
+.brand,.sp,.me{display:none}
+.tab{flex-direction:column;gap:3px;font-size:11px;padding:7px 10px;flex:1;align-items:center;text-align:center}
+.desk{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<nav id="nav"></nav>
+<main id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const I={desk:'<path d="M3 9h18M5 9v10M19 9v10M3 5h18v4H3zM9 13h6"/>',repo:'<path d="M4 5a2 2 0 012-2h13v15H6a2 2 0 00-2 2zM4 20a2 2 0 002 2h13M9 7h6"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/>',new:'<path d="M12 5v14M5 12h14"/>',me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>'};
+const svg=n=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const today=()=>new Date().toLocaleDateString('en-CA');
+let S={profile:{name:'',contact:'',pic:''},theme:'auto',projects:[],tasks:[],log:[],recent:[]};
+try{Object.assign(S,JSON.parse(localStorage.getItem('devro')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('devro',JSON.stringify(S))}catch(e){toast('Storage full. Export a backup.')}};
+const log=t=>{S.log.unshift({t,d:Date.now()});S.log=S.log.slice(0,25)};
+let view='desk',filter='all',q='',editId=null,eng='google';
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),2200)}
+
+/* theme: auto follows the device, or day/night manually */
+const mq=matchMedia('(prefers-color-scheme:dark)');
+function applyTheme(){const n=S.theme==='night'||(S.theme==='auto'&&mq.matches);document.documentElement.dataset.t=n?'night':'day'}
+mq.addEventListener('change',applyTheme);
+const themeIcon={auto:'Auto',day:'Day',night:'Night'};
+function cycleTheme(){S.theme={auto:'day',day:'night',night:'auto'}[S.theme];save();applyTheme();render();toast('Theme: '+themeIcon[S.theme])}
+
+function avatar(cls=''){return S.profile.pic?`<img class="av ${cls}" src="${S.profile.pic}" alt="">`:`<div class="av ${cls}">${esc((S.profile.name||'D')[0].toUpperCase())}</div>`}
+function nav(){const t=[['desk','Desk'],['repo','Repo'],['search','Search'],['new','New'],['me','Profile']];
+$('#nav').innerHTML=`<div class="brand"><span class="logo">D</span>Devro</div>`+t.map(([k,l])=>`<button class="tab ${view===k?'on':''}" data-go="${k}">${svg(k)}<span>${l}</span></button>`).join('')+`<div class="sp"></div><button class="me" data-go="me">${avatar()}<span><b>${esc(S.profile.name||'Set up profile')}</b><small>${esc(S.profile.contact||'Owner')}</small></span></button>`}
+function head(h,s,extra=''){return `<div class="top"><div><h1>${h}</h1><p class="sub">${s}</p></div><div class="row">${extra}<button class="ic" data-act="theme" title="Theme: ${themeIcon[S.theme]}" aria-label="Change theme"><small>${themeIcon[S.theme]}</small></button></div></div>`}
+
+function greet(){const h=new Date().getHours();const g=h<5?'Burning the midnight oil':h<12?'Good morning':h<17?'Good afternoon':'Good evening';return `${g}${S.profile.name?', '+esc(S.profile.name.split(' ')[0]):''}`}
+
+function vDesk(){const t=today();
+const open=S.tasks.filter(x=>!x.done&&x.date<t),now=S.tasks.filter(x=>x.date===t);
+const list=[...open,...now],dn=now.filter(x=>x.done).length,tot=now.length+open.length,p=tot?Math.round(dn/tot*100):0;
+const act=S.projects.filter(x=>x.status==='active').length,sus=S.projects.length-act;
+const opts=`<option value="">No project</option>`+S.projects.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');
+return head(greet(),new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'}))+
+`<div class="stats"><div class="card stat"><b>${S.projects.length}</b><span>Websites built</span></div><div class="card stat"><b style="color:var(--ok)">${act}</b><span>Live</span></div><div class="card stat"><b style="color:var(--bad)">${sus}</b><span>Suspended</span></div><div class="card stat"><b>${open.length}</b><span>Carried over</span></div></div>
+<div class="desk"><div class="card"><div class="row" style="margin-bottom:14px"><div class="ring" style="--p:${p}"><i>${p}%</i></div><div><h2>Today's desk</h2><p class="sub">${dn} of ${tot} done. New work you add today lands here.</p></div></div>
+<div class="row" style="margin-bottom:8px"><input id="tin" placeholder="What are you working on today?" maxlength="120"><select id="tpr" style="max-width:150px">${opts}</select><button class="btn" data-act="addtask">Add</button></div>
+${list.length?list.map(x=>{const pr=S.projects.find(y=>y.id===x.pid);return `<div class="task ${x.done?'done':''}"><button class="ck" data-tg="${x.id}" aria-label="Toggle">&#10003;</button><span class="tt">${esc(x.text)}</span>${pr?`<span class="tag">${esc(pr.name)}</span>`:''}${x.date<t?'<span class="tag c">carried over</span>':''}<button class="x" data-rm="${x.id}" aria-label="Delete">&#10005;</button></div>`}).join(''):'<div class="empty">Your desk is clear. Add the first job of the day.</div>'}
+${dn?`<button class="btn g s" data-act="clear" style="margin-top:12px">Clear finished</button>`:''}</div>
+<div class="card"><h2 style="margin-bottom:8px">Recent activity</h2><ul class="log">${S.log.length?S.log.slice(0,8).map(l=>`<li>${esc(l.t)} <small>${new Date(l.d).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></li>`).join(''):'<li>Nothing yet. Actions you take will show up here.</li>'}</ul></div></div>`}
+
+function vRepo(){
+const L=S.projects.filter(p=>(filter==='all'||p.status===filter)&&(p.name+p.stack+p.desc+p.url).toLowerCase().includes(q.toLowerCase()));
+return head('My repo',`All ${S.projects.length} websites in one place. Suspend or reactivate with one tap.`,'<button class="btn" data-go="new">New project</button>')+
+`<input id="rq" placeholder="Search name, stack or link" value="${esc(q)}"><div class="chips">${['all','active','suspended'].map(f=>`<button class="chip ${filter===f?'on':''}" data-f="${f}">${f[0].toUpperCase()+f.slice(1)}</button>`).join('')}<button class="chip" data-act="export">Export backup</button><button class="chip" data-act="import">Import backup</button></div>
+${L.length?`<div class="grid">${L.map(p=>{const sus=p.status==='suspended';let h='';try{h=new URL(p.url).hostname}catch(e){}
+return `<div class="card proj ${sus?'sus':''}"><div class="ph"><div class="fav">${h?`<img src="https://www.google.com/s2/favicons?domain=${h}&sz=64" alt="" onerror="this.replaceWith(document.createTextNode('${esc(p.name[0]||'?').toUpperCase()}'))">`:esc(p.name[0]||'?').toUpperCase()}</div><h3>${esc(p.name)}</h3><span class="pill">${sus?'Suspended':'Active'}</span></div>
+<p>${esc(p.desc||'No description yet.')}</p>${p.stack?`<div><span class="tag">${esc(p.stack)}</span></div>`:''}
+<div class="acts">${p.url&&!sus?`<a class="btn s" href="${esc(p.url)}" target="_blank" rel="noopener">Visit</a>`:''}${p.repo?`<a class="btn g s" href="${esc(p.repo)}" target="_blank" rel="noopener">Code</a>`:''}<button class="btn g s" data-sus="${p.id}">${sus?'Reactivate':'Suspend'}</button><button class="btn g s" data-ed="${p.id}">Edit</button><button class="btn d s" data-del="${p.id}">Delete</button></div></div>`}).join('')}</div>`:`<div class="empty card">${S.projects.length?'No website matches that filter.':'No websites yet. Add your first one with New project.'}</div>`}`}
+
+function vNew(){const p=S.projects.find(x=>x.id===editId)||{name:'',url:'',repo:'',stack:'',desc:'',status:'active'};
+return head(editId?'Edit project':'New project',editId?'Update the details and save.':'Register a website you have built.')+
+`<div class="card form"><label>Project name<input id="f1" value="${esc(p.name)}" placeholder="e.g. Bright Bakery"></label>
+<label>Live link<input id="f2" value="${esc(p.url)}" placeholder="https://example.com" inputmode="url"></label>
+<label>Repository link (optional)<input id="f3" value="${esc(p.repo)}" placeholder="https://github.com/you/project"></label>
+<label>Stack<input id="f4" value="${esc(p.stack)}" placeholder="HTML, React, Node..."></label>
+<label>What is it?<textarea id="f5" rows="3">${esc(p.desc)}</textarea></label>
+<label>Status<select id="f6"><option value="active" ${p.status==='active'?'selected':''}>Active</option><option value="suspended" ${p.status==='suspended'?'selected':''}>Suspended</option></select></label>
+<div class="row"><button class="btn" data-act="saveproj">${editId?'Save changes':'Add project'}</button>${editId?'<button class="btn g" data-act="cancel">Cancel</button>':''}</div></div>`}
+
+const ENG={google:['Google','https://www.google.com/search?q='],github:['GitHub','https://github.com/search?q='],so:['Stack Overflow','https://stackoverflow.com/search?q='],mdn:['MDN','https://developer.mozilla.org/en-US/search?q='],yt:['YouTube','https://www.youtube.com/results?search_query=']};
+function vSearch(){return head('Search','Look anything up without leaving your office.')+
+`<div class="big"><input id="sq" placeholder="Search ${ENG[eng][0]}" autofocus><button class="btn" data-act="dosearch">Search</button></div>
+<div class="eng">${Object.entries(ENG).map(([k,v])=>`<button class="chip ${eng===k?'on':''}" data-eng="${k}">${v[0]}</button>`).join('')}</div>
+<div class="card"><h2 style="margin-bottom:8px">Recent searches</h2>${S.recent.length?S.recent.map(r=>`<button class="chip" style="margin:0 6px 6px 0" data-rs="${esc(r)}">${esc(r)}</button>`).join(''):'<p class="sub">Your searches will appear here.</p>'}</div>`}
+
+function vMe(){const p=S.profile;return head('Profile','The owner behind every site.')+
+`<div class="card form"><div class="row">${avatar('big-av')}<div><button class="btn g" data-act="pic">Upload picture</button>${p.pic?' <button class="btn d s" data-act="rmpic">Remove</button>':''}</div></div>
+<label>Full name<input id="pn" value="${esc(p.name)}" placeholder="Your name"></label>
+<label>Contact (email or phone)<input id="pc" value="${esc(p.contact)}" placeholder="you@example.com"></label>
+<label>Appearance<select id="pt"><option value="auto" ${S.theme==='auto'?'selected':''}>Auto (follow my device)</option><option value="day" ${S.theme==='day'?'selected':''}>Day</option><option value="night" ${S.theme==='night'?'selected':''}>Night</option></select></label>
+<div class="row"><button class="btn" data-act="saveme">Save profile</button></div></div>`}
+
+function render(){nav();const v={desk:vDesk,repo:vRepo,new:vNew,search:vSearch,me:vMe}[view]();$('#main').innerHTML=`<div class="view">${v}</div>`;
+const rq=$('#rq');if(rq){rq.oninput=e=>{q=e.target.value;const pos=e.target.selectionStart;render();const n=$('#rq');n.focus();n.setSelectionRange(pos,pos)}}
+for(const [id,fn] of [['tin','addtask'],['sq','dosearch']]){const el=$('#'+id);if(el)el.onkeydown=e=>{if(e.key==='Enter')act(fn)}}}
+const go=v=>{if(v!=='new')editId=null;view=v;render();$('#main').scrollTo(0,0)};
+
+function pick(cb){const i=document.createElement('input');i.type='file';i.accept=cb.accept;i.onchange=()=>i.files[0]&&cb.fn(i.files[0]);i.click()}
+function act(a){const g=id=>$('#'+id)?.value.trim();
+if(a==='theme')return cycleTheme();
+if(a==='addtask'){const t=g('tin');if(!t)return toast('Type a task first');S.tasks.push({id:uid(),text:t,pid:$('#tpr').value,date:today(),done:false});log('Added task: '+t);save();render();$('#tin').focus()}
+if(a==='clear'){S.tasks=S.tasks.filter(x=>!(x.done&&x.date<=today()));save();render()}
+if(a==='saveproj'){const name=g('f1');if(!name)return toast('Give the project a name');let url=g('f2');if(url&&!/^https?:\/\//.test(url))url='https://'+url;
+const d={name,url,repo:g('f3'),stack:g('f4'),desc:g('f5'),status:$('#f6').value};
+if(editId){Object.assign(S.projects.find(x=>x.id===editId),d);log('Updated '+name)}else{S.projects.unshift({id:uid(),...d});log('Added project '+name)}
+editId=null;save();toast('Saved');go('repo')}
+if(a==='cancel')go('repo');
+if(a==='dosearch'){const s=g('sq');if(!s)return;S.recent=[s,...S.recent.filter(x=>x!==s)].slice(0,8);save();open(ENG[eng][1]+encodeURIComponent(s),'_blank','noopener');render()}
+if(a==='saveme'){S.profile.name=g('pn');S.profile.contact=g('pc');S.theme=$('#pt').value;save();applyTheme();toast('Profile saved');render()}
+if(a==='pic')pick({accept:'image/*',fn:f=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),s=256,m=Math.min(im.width,im.height);c.width=c.height=s;c.getContext('2d').drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,s,s);S.profile.pic=c.toDataURL('image/jpeg',.85);save();render()};im.src=r.result};r.readAsDataURL(f)}});
+if(a==='rmpic'){S.profile.pic='';save();render()}
+if(a==='export'){const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'}),l=document.createElement('a');l.href=URL.createObjectURL(b);l.download='devro-backup-'+today()+'.json';l.click()}
+if(a==='import')pick({accept:'.json',fn:f=>f.text().then(t=>{try{Object.assign(S,JSON.parse(t));save();applyTheme();render();toast('Backup restored')}catch(e){toast('That file is not a Devro backup')}})})}
+
+document.addEventListener('click',e=>{const t=e.target.closest('button,a');if(!t)return;const d=t.dataset;
+if(d.go)return go(d.go);if(d.act)return act(d.act);
+if(d.tg){const x=S.tasks.find(y=>y.id===d.tg);x.done=!x.done;if(x.done)log('Finished: '+x.text);save();return render()}
+if(d.rm){S.tasks=S.tasks.filter(y=>y.id!==d.rm);save();return render()}
+if(d.f){filter=d.f;return render()}
+if(d.eng){eng=d.eng;return render()}
+if(d.rs){$('#sq').value=d.rs;return act('dosearch')}
+if(d.sus){const p=S.projects.find(y=>y.id===d.sus);p.status=p.status==='active'?'suspended':'active';log((p.status==='active'?'Reactivated ':'Suspended ')+p.name);save();toast(p.name+' is now '+p.status);return render()}
+if(d.ed){editId=d.ed;return go('new')}
+if(d.del){const p=S.projects.find(y=>y.id===d.del);if(confirm('Delete '+p.name+' from Devro? This cannot be undone.')){S.projects=S.projects.filter(y=>y.id!==d.del);log('Deleted '+p.name);save();render()}}});
+
+applyTheme();
+if(!S.profile.name)view='me';
+render();
+</script>
+</body>
+</html>
