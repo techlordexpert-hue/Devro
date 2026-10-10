@@ -84,6 +84,22 @@ input:focus,textarea:focus,select:focus{border-color:var(--ac);outline:0;box-sha
 .big-av{width:110px;height:110px;font-size:40px}
 .log li{list-style:none;padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px;color:var(--mu)}
 .log li:last-child{border:0}
+#gate{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:20px;background:radial-gradient(circle at 20% 20%,color-mix(in srgb,var(--ac) 30%,var(--bg)),var(--bg) 60%)}
+#gate.on{display:grid}
+.gbox{width:min(380px,100%);text-align:center;animation:in .6s cubic-bezier(.2,.8,.2,1)}
+.gbox .logo{width:64px;height:64px;font-size:32px;border-radius:20px;margin:0 auto 18px}
+.gbox input{text-align:center;font-size:20px;letter-spacing:.2em;margin:18px 0 12px}
+.gbox.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.gerr{color:var(--bad);min-height:20px;font-size:14px;margin-bottom:8px}
+#pal{position:fixed;inset:0;z-index:40;background:rgba(10,8,20,.55);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;padding:12vh 16px}
+#pal.on{display:flex}
+.pbox{width:min(520px,100%);animation:in .25s}
+.pbox .card{padding:10px}
+.pit{display:flex;justify-content:space-between;width:100%;padding:11px 12px;border-radius:10px;text-align:left}
+.pit:hover,.pit.on{background:var(--sf2)}
+.tmv{font-family:'Bricolage Grotesque';font-size:44px;font-weight:700;margin:6px 0 12px}
+.hl{font-size:12px;color:var(--ok)}.hl.bad{color:var(--bad)}
 @media(max-width:860px){
 .app{grid-template-columns:1fr;grid-template-rows:1fr auto}
 nav{order:2;flex-direction:row;border:0;border-top:1px solid var(--bd);padding:8px 8px calc(8px + env(safe-area-inset-bottom));justify-content:space-around;position:relative;z-index:5}
@@ -100,6 +116,8 @@ nav{order:2;flex-direction:row;border:0;border-top:1px solid var(--bd);padding:8
 <main id="main"></main>
 </div>
 <div class="toast" id="toast"></div>
+<div id="gate"></div>
+<div id="pal"></div>
 
 <script>
 const I={desk:'<path d="M3 9h18M5 9v10M19 9v10M3 5h18v4H3zM9 13h6"/>',repo:'<path d="M4 5a2 2 0 012-2h13v15H6a2 2 0 00-2 2zM4 20a2 2 0 002 2h13M9 7h6"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/>',new:'<path d="M12 5v14M5 12h14"/>',me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>'};
@@ -125,9 +143,9 @@ function cycleTheme(){S.theme={auto:'day',day:'night',night:'auto'}[S.theme];sav
 function avatar(cls=''){return S.profile.pic?`<img class="av ${cls}" src="${S.profile.pic}" alt="">`:`<div class="av ${cls}">${esc((S.profile.name||'D')[0].toUpperCase())}</div>`}
 function nav(){const t=[['desk','Desk'],['repo','Repo'],['search','Search'],['new','New'],['me','Profile']];
 $('#nav').innerHTML=`<div class="brand"><span class="logo">D</span>Devro</div>`+t.map(([k,l])=>`<button class="tab ${view===k?'on':''}" data-go="${k}">${svg(k)}<span>${l}</span></button>`).join('')+`<div class="sp"></div><button class="me" data-go="me">${avatar()}<span><b>${esc(S.profile.name||'Set up profile')}</b><small>${esc(S.profile.contact||'Owner')}</small></span></button>`}
-function head(h,s,extra=''){return `<div class="top"><div><h1>${h}</h1><p class="sub">${s}</p></div><div class="row">${extra}<button class="ic" data-act="theme" title="Theme: ${themeIcon[S.theme]}" aria-label="Change theme"><small>${themeIcon[S.theme]}</small></button></div></div>`}
+function head(h,s,extra=''){return `<div class="top"><div><h1>${h}</h1><p class="sub">${s}</p></div><div class="row">${extra}<button class="ic" data-act="pal" title="Quick find (Ctrl+K)" aria-label="Quick find">${svg('search')}</button><button class="ic" data-act="lock" title="Lock Devro" aria-label="Lock"><small>Lock</small></button><button class="ic" data-act="theme" title="Theme: ${themeIcon[S.theme]}" aria-label="Change theme"><small>${themeIcon[S.theme]}</small></button></div></div>`}
 
-function greet(){const h=new Date().getHours();const g=h<5?'Burning the midnight oil':h<12?'Good morning':h<17?'Good afternoon':'Good evening';return `${g}${S.profile.name?', '+esc(S.profile.name.split(' ')[0]):''}`}
+function greet(){const h=new Date().getHours();const g=h<5?'Burning the midnight oil':h<12?'Good morning':h<17?'Good afternoon':'Good evening';return `${g}${S.profile.name?' '+esc(S.profile.name):''}`}
 
 function vDesk(){const t=today();
 const open=S.tasks.filter(x=>!x.done&&x.date<t),now=S.tasks.filter(x=>x.date===t);
@@ -140,16 +158,16 @@ return head(greet(),new Date().toLocaleDateString(undefined,{weekday:'long',day:
 <div class="row" style="margin-bottom:8px"><input id="tin" placeholder="What are you working on today?" maxlength="120"><select id="tpr" style="max-width:150px">${opts}</select><button class="btn" data-act="addtask">Add</button></div>
 ${list.length?list.map(x=>{const pr=S.projects.find(y=>y.id===x.pid);return `<div class="task ${x.done?'done':''}"><button class="ck" data-tg="${x.id}" aria-label="Toggle">&#10003;</button><span class="tt">${esc(x.text)}</span>${pr?`<span class="tag">${esc(pr.name)}</span>`:''}${x.date<t?'<span class="tag c">carried over</span>':''}<button class="x" data-rm="${x.id}" aria-label="Delete">&#10005;</button></div>`}).join(''):'<div class="empty">Your desk is clear. Add the first job of the day.</div>'}
 ${dn?`<button class="btn g s" data-act="clear" style="margin-top:12px">Clear finished</button>`:''}</div>
-<div class="card"><h2 style="margin-bottom:8px">Recent activity</h2><ul class="log">${S.log.length?S.log.slice(0,8).map(l=>`<li>${esc(l.t)} <small>${new Date(l.d).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></li>`).join(''):'<li>Nothing yet. Actions you take will show up here.</li>'}</ul></div></div>`}
+<div style="display:grid;gap:18px;align-content:start"><div class="card"><h2>Focus timer</h2><p class="sub">25 minutes of deep work.</p><div class="tmv" id="tmv">${fmt(tm.left)}</div><div class="row"><button class="btn s" data-act="tmgo">${tm.run?'Pause':'Start'}</button><button class="btn g s" data-act="tmreset">Reset</button></div></div><div class="card"><h2 style="margin-bottom:8px">Recent activity</h2><ul class="log">${S.log.length?S.log.slice(0,8).map(l=>`<li>${esc(l.t)} <small>${new Date(l.d).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></li>`).join(''):'<li>Nothing yet. Actions you take will show up here.</li>'}</ul></div></div></div>`}
 
 function vRepo(){
 const L=S.projects.filter(p=>(filter==='all'||p.status===filter)&&(p.name+p.stack+p.desc+p.url).toLowerCase().includes(q.toLowerCase()));
 return head('My repo',`All ${S.projects.length} websites in one place. Suspend or reactivate with one tap.`,'<button class="btn" data-go="new">New project</button>')+
-`<input id="rq" placeholder="Search name, stack or link" value="${esc(q)}"><div class="chips">${['all','active','suspended'].map(f=>`<button class="chip ${filter===f?'on':''}" data-f="${f}">${f[0].toUpperCase()+f.slice(1)}</button>`).join('')}<button class="chip" data-act="export">Export backup</button><button class="chip" data-act="import">Import backup</button></div>
+`<input id="rq" placeholder="Search name, stack or link" value="${esc(q)}"><div class="chips">${['all','active','suspended'].map(f=>`<button class="chip ${filter===f?'on':''}" data-f="${f}">${f[0].toUpperCase()+f.slice(1)}</button>`).join('')}<button class="chip" data-act="checkall">Check all sites</button><button class="chip" data-act="export">Export backup</button><button class="chip" data-act="import">Import backup</button></div>
 ${L.length?`<div class="grid">${L.map(p=>{const sus=p.status==='suspended';let h='';try{h=new URL(p.url).hostname}catch(e){}
 return `<div class="card proj ${sus?'sus':''}"><div class="ph"><div class="fav">${h?`<img src="https://www.google.com/s2/favicons?domain=${h}&sz=64" alt="" onerror="this.replaceWith(document.createTextNode('${esc(p.name[0]||'?').toUpperCase()}'))">`:esc(p.name[0]||'?').toUpperCase()}</div><h3>${esc(p.name)}</h3><span class="pill">${sus?'Suspended':'Active'}</span></div>
-<p>${esc(p.desc||'No description yet.')}</p>${p.stack?`<div><span class="tag">${esc(p.stack)}</span></div>`:''}
-<div class="acts">${p.url&&!sus?`<a class="btn s" href="${esc(p.url)}" target="_blank" rel="noopener">Visit</a>`:''}${p.repo?`<a class="btn g s" href="${esc(p.repo)}" target="_blank" rel="noopener">Code</a>`:''}<button class="btn g s" data-sus="${p.id}">${sus?'Reactivate':'Suspend'}</button><button class="btn g s" data-ed="${p.id}">Edit</button><button class="btn d s" data-del="${p.id}">Delete</button></div></div>`}).join('')}</div>`:`<div class="empty card">${S.projects.length?'No website matches that filter.':'No websites yet. Add your first one with New project.'}</div>`}`}
+<p>${esc(p.desc||'No description yet.')}</p>${p.hl?`<span class="hl ${p.hl.ok?'':'bad'}">${p.hl.ok?'Reachable, '+p.hl.ms+' ms':'Not reachable'} (checked ${new Date(p.hl.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})})</span>`:''}${p.stack?`<div><span class="tag">${esc(p.stack)}</span></div>`:''}
+<div class="acts">${p.url&&!sus?`<a class="btn s" href="${esc(p.url)}" target="_blank" rel="noopener">Visit</a>`:''}${p.repo?`<a class="btn g s" href="${esc(p.repo)}" target="_blank" rel="noopener">Code</a>`:''}${p.url&&!sus?`<button class="btn g s" data-chk="${p.id}">Check</button>`:''}<button class="btn g s" data-sus="${p.id}">${sus?'Reactivate':'Suspend'}</button><button class="btn g s" data-ed="${p.id}">Edit</button><button class="btn d s" data-del="${p.id}">Delete</button></div></div>`}).join('')}</div>`:`<div class="empty card">${S.projects.length?'No website matches that filter.':'No websites yet. Add your first one with New project.'}</div>`}`}
 
 function vNew(){const p=S.projects.find(x=>x.id===editId)||{name:'',url:'',repo:'',stack:'',desc:'',status:'active'};
 return head(editId?'Edit project':'New project',editId?'Update the details and save.':'Register a website you have built.')+
@@ -182,6 +200,11 @@ const go=v=>{if(v!=='new')editId=null;view=v;render();$('#main').scrollTo(0,0)};
 function pick(cb){const i=document.createElement('input');i.type='file';i.accept=cb.accept;i.onchange=()=>i.files[0]&&cb.fn(i.files[0]);i.click()}
 function act(a){const g=id=>$('#'+id)?.value.trim();
 if(a==='theme')return cycleTheme();
+if(a==='lock')return lock();
+if(a==='pal')return openPal();
+if(a==='tmgo'){tm.run=!tm.run;clearInterval(tm.h);if(tm.run)tm.h=setInterval(tick,1000);return render()}
+if(a==='tmreset'){clearInterval(tm.h);tm.run=false;tm.left=1500;return render()}
+if(a==='checkall'){const L=S.projects.filter(p=>p.url&&p.status==='active');toast('Checking '+L.length+' sites...');return Promise.all(L.map(p=>check(p.id,1))).then(()=>{save();render();toast('Check complete')})}
 if(a==='addtask'){const t=g('tin');if(!t)return toast('Type a task first');S.tasks.push({id:uid(),text:t,pid:$('#tpr').value,date:today(),done:false});log('Added task: '+t);save();render();$('#tin').focus()}
 if(a==='clear'){S.tasks=S.tasks.filter(x=>!(x.done&&x.date<=today()));save();render()}
 if(a==='saveproj'){const name=g('f1');if(!name)return toast('Give the project a name');let url=g('f2');if(url&&!/^https?:\/\//.test(url))url='https://'+url;
@@ -201,15 +224,51 @@ if(d.go)return go(d.go);if(d.act)return act(d.act);
 if(d.tg){const x=S.tasks.find(y=>y.id===d.tg);x.done=!x.done;if(x.done)log('Finished: '+x.text);save();return render()}
 if(d.rm){S.tasks=S.tasks.filter(y=>y.id!==d.rm);save();return render()}
 if(d.f){filter=d.f;return render()}
+if(d.chk){return check(d.chk)}
+if(d.pi){palGo(d.pi)}
 if(d.eng){eng=d.eng;return render()}
 if(d.rs){$('#sq').value=d.rs;return act('dosearch')}
 if(d.sus){const p=S.projects.find(y=>y.id===d.sus);p.status=p.status==='active'?'suspended':'active';log((p.status==='active'?'Reactivated ':'Suspended ')+p.name);save();toast(p.name+' is now '+p.status);return render()}
 if(d.ed){editId=d.ed;return go('new')}
 if(d.del){const p=S.projects.find(y=>y.id===d.del);if(confirm('Delete '+p.name+' from Devro? This cannot be undone.')){S.projects=S.projects.filter(y=>y.id!==d.del);log('Deleted '+p.name);save();render()}}});
 
+/* focus timer */
+const fmt=n=>String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');
+let tm={left:1500,run:false,h:0};
+function tick(){tm.left--;const e=$('#tmv');if(e)e.textContent=fmt(tm.left);if(tm.left<=0){clearInterval(tm.h);tm.run=false;tm.left=1500;log('Finished a focus session');save();toast('Focus session complete. Take a break.');render()}}
+
+/* site health: a no-cors request succeeds if the host answers */
+async function check(id,quiet){const p=S.projects.find(x=>x.id===id);if(!p||!p.url)return;const t0=performance.now();let ok=true;
+try{const c=new AbortController(),to=setTimeout(()=>c.abort(),8000);await fetch(p.url,{mode:'no-cors',cache:'no-store',signal:c.signal});clearTimeout(to)}catch(e){ok=false}
+p.hl={ok,ms:Math.round(performance.now()-t0),t:Date.now()};if(!quiet){log('Checked '+p.name+': '+(ok?'up':'down'));save();render()}}
+
+/* quick find (Ctrl+K) */
+let palQ='';
+function openPal(){palQ='';$('#pal').classList.add('on');drawPal();setTimeout(()=>$('#pq')?.focus(),30)}
+function closePal(){$('#pal').classList.remove('on')}
+function palItems(){const t=[['desk','Go to Desk'],['repo','Go to Repo'],['search','Go to Search'],['new','Add a new project'],['me','Open Profile']].map(([k,l])=>({k:'v:'+k,l}));
+const pr=S.projects.map(p=>({k:'p:'+p.id,l:p.name,r:p.status}));return [...t,...pr].filter(i=>i.l.toLowerCase().includes(palQ.toLowerCase())).slice(0,8)}
+function drawPal(){$('#pal').innerHTML=`<div class="pbox"><div class="card"><input id="pq" placeholder="Jump to a page or website" value="${esc(palQ)}">${palItems().map((i,n)=>`<button class="pit ${n?'':'on'}" data-pi="${esc(i.k)}"><span>${esc(i.l)}</span><small style="color:var(--mu)">${esc(i.r||'')}</small></button>`).join('')}</div></div>`;
+const q=$('#pq');q.oninput=e=>{palQ=e.target.value;drawPal();const n=$('#pq');n.focus();n.setSelectionRange(n.value.length,n.value.length)};q.onkeydown=e=>{if(e.key==='Enter'){const f=palItems()[0];if(f)palGo(f.k)}}}
+function palGo(k){closePal();if(k.startsWith('v:'))return go(k.slice(2));const p=S.projects.find(x=>x.id===k.slice(2));q=p?p.name:'';filter='all';go('repo')}
+$('#pal').addEventListener('click',e=>{if(e.target.id==='pal')closePal()});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'&&!$('#gate').classList.contains('on')){e.preventDefault();openPal()}if(e.key==='Escape')closePal()});
+
+/* password gate: only a salted SHA-256 hash is stored, the password itself never appears in the page */
+const H='f9fe548830cb8a7f4059ee9950425a410cfa7f0c0022fea51d9591f47e857bcb';
+const sha=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(b=>b.toString(16).padStart(2,'0')).join('');
+let fails=0,until=0,idle=0,booted=false;
+const unlocked=()=>{try{return sessionStorage.getItem('dv_ok')==='1'}catch(e){return false}};
+function lock(){try{sessionStorage.removeItem('dv_ok')}catch(e){}closePal();showGate()}
+function showGate(){const g=$('#gate');g.classList.add('on');document.querySelector('.app').style.visibility='hidden';
+g.innerHTML=`<div class="gbox" id="gb"><div class="logo">D</div><h1>Devro</h1><p class="sub">${S.profile.name?'Welcome back, '+esc(S.profile.name)+'.':'Your private work office.'}</p><input id="pw" type="password" autocomplete="current-password" placeholder="Password" aria-label="Password"><div class="gerr" id="ge"></div><button class="btn" style="width:100%;justify-content:center" id="gb2">Unlock</button></div>`;
+const go1=async()=>{const now=Date.now();if(now<until){$('#ge').textContent='Too many tries. Wait '+Math.ceil((until-now)/1000)+'s.';return}
+const v=$('#pw').value;if(v&&await sha('devro.v1:'+v)===H){fails=0;try{sessionStorage.setItem('dv_ok','1')}catch(e){}g.classList.remove('on');g.innerHTML='';document.querySelector('.app').style.visibility='';boot()}
+else{fails++;$('#ge').textContent=fails>=5?'Locked for 30 seconds.':'Incorrect password.';if(fails>=5){until=Date.now()+30000;fails=0}$('#pw').value='';const b=$('#gb');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake')}};
+$('#gb2').onclick=go1;$('#pw').onkeydown=e=>{if(e.key==='Enter')go1()};setTimeout(()=>$('#pw').focus(),50)}
+function boot(){if(!S.profile.name)view='me';render();if(!booted){booted=true;const rst=()=>{clearTimeout(idle);idle=setTimeout(lock,10*60*1000)};['click','keydown','touchstart','mousemove'].forEach(ev=>addEventListener(ev,rst,{passive:true}));rst()}}
 applyTheme();
-if(!S.profile.name)view='me';
-render();
+if(unlocked())boot();else showGate();
 </script>
 </body>
 </html>
